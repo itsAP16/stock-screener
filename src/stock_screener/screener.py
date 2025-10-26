@@ -1,6 +1,7 @@
 """Core screening logic."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Iterable, Sequence
 
 from .criteria import StockFilterCriteria
@@ -21,17 +22,27 @@ DEFAULT_TICKERS: Sequence[str] = (
 )
 
 
+@dataclass(frozen=True)
+class ScreeningResult:
+    """Aggregate outcome from screening a batch of tickers."""
+
+    matches: list[StockFinancials]
+    non_matches: list[StockFinancials]
+    errors: list[FetchResult]
+
+
 def screen_stocks(
     tickers: Iterable[str],
     criteria: StockFilterCriteria,
-) -> tuple[list[StockFinancials], list[FetchResult]]:
+) -> ScreeningResult:
     """Screen stocks based on the supplied ``criteria``.
 
-    Returns a tuple where the first element is a list of matching ``StockFinancials``
-    and the second element contains fetch results for tickers that failed to load.
+    Returns a ``ScreeningResult`` containing the matching and non-matching
+    ``StockFinancials`` as well as any tickers that failed to load.
     """
 
     matches: list[StockFinancials] = []
+    non_matches: list[StockFinancials] = []
     errors: list[FetchResult] = []
 
     for result in fetch_many(tickers):
@@ -41,5 +52,7 @@ def screen_stocks(
 
         if criteria.matches(result.financials):
             matches.append(result.financials)
+        else:
+            non_matches.append(result.financials)
 
-    return matches, errors
+    return ScreeningResult(matches=matches, non_matches=non_matches, errors=errors)
