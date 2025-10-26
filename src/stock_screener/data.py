@@ -2,9 +2,21 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, TYPE_CHECKING
 
-import yfinance as yf
+try:  # pragma: no cover - import guard
+    import yfinance as yf
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    yf = None  # type: ignore[assignment]
+    _YFINANCE_IMPORT_ERROR = (
+        "The 'yfinance' package is required to fetch stock data. "
+        "Install it with `pip install yfinance`."
+    )
+else:
+    _YFINANCE_IMPORT_ERROR = ""
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import yfinance as _yfinance
 
 from .models import StockFinancials
 
@@ -32,7 +44,7 @@ def fetch_financials(ticker: str) -> FetchResult:
         An object containing the retrieved ``StockFinancials`` or an error message.
     """
 
-    ticker_obj = yf.Ticker(ticker)
+    ticker_obj = _require_yfinance().Ticker(ticker)
     try:
         info = ticker_obj.info
     except Exception as exc:  # pragma: no cover - defensive programming
@@ -54,6 +66,12 @@ def fetch_many(tickers: Iterable[str]) -> Iterator[FetchResult]:
 
     for ticker in tickers:
         yield fetch_financials(ticker)
+
+
+def _require_yfinance() -> "_yfinance":
+    if yf is None:
+        raise ModuleNotFoundError(_YFINANCE_IMPORT_ERROR)
+    return yf
 
 
 def _safe_float(info: dict, key: str) -> float | None:
