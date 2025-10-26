@@ -1,4 +1,4 @@
-"""Utilities for screening stocks using Yahoo Finance data."""
+"""Utilities for screening stocks with pluggable data sources."""
 
 from .criteria import StockFilterCriteria
 from .models import StockFinancials
