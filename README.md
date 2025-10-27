@@ -11,6 +11,16 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+To work on the project as an installable package in development mode, install it
+directly from the repository root:
+
+```bash
+pip install -e .
+```
+
+This exposes the package (`stock_screener`) and a `stock-screener` console
+script for local testing without repeatedly adjusting `PYTHONPATH`.
+
 ## Usage
 
 Run the screener with default tickers:
