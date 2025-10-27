@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-screener"
+version = "0.1.0"
+description = "A simple command-line stock screener that retrieves fundamental data from Yahoo Finance."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "yfinance>=0.2.28",
+]
+
+[project.scripts]
+stock-screener = "stock_screener.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
