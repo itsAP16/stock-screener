@@ -22,7 +22,7 @@ class StockFinancials:
     market_cap: Optional[float]
     price_history: Optional[Sequence[tuple[date, float]]] = None
 
-    def metadata_row(self) -> list[Optional[float] | str]:
+    def metadata(self) -> list[Optional[float] | str]:
         """Return only the point-in-time metrics for tabular display."""
 
         return [
@@ -32,3 +32,62 @@ class StockFinancials:
             self.dividend_yield,
             self.market_cap,
         ]
+
+    @classmethod
+    def builder(cls, ticker: str) -> StockFinancialsBuilder:
+        """Start a builder for ``StockFinancials`` instances."""
+
+        return StockFinancialsBuilder(ticker=ticker)
+
+
+class StockFinancialsBuilder:
+    """Builder for :class:`StockFinancials`."""
+
+    def __init__(
+        self,
+        *,
+        ticker: str,
+        pe_ratio: Optional[float] = None,
+        pb_ratio: Optional[float] = None,
+        dividend_yield: Optional[float] = None,
+        market_cap: Optional[float] = None,
+        price_history: Optional[Sequence[tuple[date, float]]] = None,
+    ) -> None:
+        self._ticker = ticker
+        self._pe_ratio = pe_ratio
+        self._pb_ratio = pb_ratio
+        self._dividend_yield = dividend_yield
+        self._market_cap = market_cap
+        self._price_history = price_history
+
+    def with_pe_ratio(self, value: Optional[float]) -> StockFinancialsBuilder:
+        self._pe_ratio = value
+        return self
+
+    def with_pb_ratio(self, value: Optional[float]) -> StockFinancialsBuilder:
+        self._pb_ratio = value
+        return self
+
+    def with_dividend_yield(self, value: Optional[float]) -> StockFinancialsBuilder:
+        self._dividend_yield = value
+        return self
+
+    def with_market_cap(self, value: Optional[float]) -> StockFinancialsBuilder:
+        self._market_cap = value
+        return self
+
+    def with_price_history(
+        self, value: Optional[Sequence[tuple[date, float]]]
+    ) -> StockFinancialsBuilder:
+        self._price_history = value
+        return self
+
+    def build(self) -> StockFinancials:
+        return StockFinancials(
+            ticker=self._ticker,
+            pe_ratio=self._pe_ratio,
+            pb_ratio=self._pb_ratio,
+            dividend_yield=self._dividend_yield,
+            market_cap=self._market_cap,
+            price_history=self._price_history,
+        )
