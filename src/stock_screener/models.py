@@ -2,21 +2,28 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from datetime import date
+from typing import Optional, Sequence
 
 
 @dataclass(frozen=True)
 class StockFinancials:
-    """Snapshot of a company's key valuation metrics."""
+    """Snapshot of a company's key valuation metrics.
+
+    The ``price_history`` attribute can be used to store a sequence of
+    ``(date, price)`` pairs—such as daily closing prices—to enable
+    time-series analysis alongside the point-in-time metrics.
+    """
 
     ticker: str
     pe_ratio: Optional[float]
     pb_ratio: Optional[float]
     dividend_yield: Optional[float]
     market_cap: Optional[float]
+    price_history: Optional[Sequence[tuple[date, float]]] = None
 
-    def as_row(self) -> list[Optional[float]]:
-        """Return the financial metrics as a list suitable for table output."""
+    def metadata(self) -> list[Optional[float] | str]:
+        """Return only the point-in-time metrics for tabular display."""
 
         return [
             self.ticker,
@@ -25,3 +32,4 @@ class StockFinancials:
             self.dividend_yield,
             self.market_cap,
         ]
+
